@@ -35,13 +35,9 @@ public class ProductoController {
         return updateCount;
     }
 
-    public int eliminar(Integer id) throws SQLException {
-        Connection con = new ConnectionFactory().newConnection();
-        PreparedStatement statement = con.prepareStatement("DELETE FROM product WHERE id = ?");
-        statement.setInt(1, id);
-        statement.execute();
-        con.close();
-        return statement.getUpdateCount();
+    public int eliminar(Integer id) {
+
+        return productoDAO.eliminar(id);
     }
 
     public List<Producto> listar() {
@@ -49,7 +45,6 @@ public class ProductoController {
     }
 
     public void guardar(Producto producto){
-        ProductoDAO productoDAO = new ProductoDAO(new ConnectionFactory().newConnection());
         productoDAO.guardar(producto);
     }
 

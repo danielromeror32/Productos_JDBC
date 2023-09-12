@@ -15,54 +15,74 @@ public class ProductoDAO {
     public ProductoDAO(Connection con) {
         this.con = con;
     }
-
-    public List<Producto> listar(){
-        List<Producto> resultado = new ArrayList<>();
-        // ConnectionFactory factory = new ConnectionFactory();
-        //final Connection con = new ConnectionFactory().newConnection();
-        try (con) {
-            PreparedStatement statement = con.prepareStatement("SELECT id, name, description, amount FROM product");
-            statement.execute();
-            ResultSet resultSet = statement.getResultSet();
-
-            while (resultSet.next()) {
-                Producto fila = new Producto(resultSet.getInt("id"),
-                        resultSet.getString("name"), resultSet.getString("description"),
-                        resultSet.getInt("amount"));
-                resultado.add(fila);
-            }
-            return resultado;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
     public void guardar(Producto producto) {
-        try (con) {
-            ejecutarRegistro(producto, con);
-            con.commit();
-        } catch (SQLException e) {
-            throw new RuntimeException();
-        }
-    }
 
-    private static void ejecutarRegistro(Producto producto, Connection con) {
-        try (PreparedStatement statement = con.prepareStatement("INSERT INTO product (name, description, amount) VALUES (?, ?, ?)",
-                Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, producto.getNombre());
-            statement.setString(2, producto.getDescripcion());
-            statement.setInt(3, producto.getCantidad());
-            statement.execute();
-            final ResultSet resultSet = statement.getGeneratedKeys();
-            try (resultSet) {
-                while (resultSet.next()) {
-                    producto.setId(resultSet.getInt(1));
-                    System.out.println(
-                            String.format(
-                                    "Fue insertado el producto ID %s", producto));
+        try {
+            PreparedStatement statement;
+            statement = con.prepareStatement(
+                    "INSERT INTO PRODUCTO "
+                            + "(nombre, descripcion, cantidad)"
+                            + " VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            try (statement) {
+                statement.setString(1, producto.getNombre());
+                statement.setString(2, producto.getDescripcion());
+                statement.setInt(3, producto.getCantidad());
+
+                statement.execute();
+
+                final ResultSet resultSet = statement.getGeneratedKeys();
+
+                try (resultSet) {
+                    while (resultSet.next()) {
+                        producto.setId(resultSet.getInt(1));
+
+                        System.out.println(String.format("Fue insertado el producto: %s", producto));
+                    }
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
     }
+
+
+    public List<Producto> listar() {
+        List<Producto> resultado = new ArrayList<>();
+        // ConnectionFactory factory = new ConnectionFactory();
+        //final Connection con = new ConnectionFactory().newConnection();
+        try  {
+            PreparedStatement statement = con.prepareStatement("SELECT id, nombre, descripcion, cantidad FROM producto");
+            statement.execute();
+            final ResultSet resultSet = statement.getResultSet();
+            try(resultSet){
+                while (resultSet.next()) {
+                    Producto fila = new Producto(resultSet.getInt("id"),
+                            resultSet.getString("nombre"), resultSet.getString("descripcion"),
+                            resultSet.getInt("cantidad"));
+                    resultado.add(fila);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return resultado;
+    }
+    public int eliminar(Integer id) {
+
+        try {
+            final PreparedStatement statement = con.prepareStatement("DELETE FROM producto WHERE id = ?");
+            try(statement) {
+
+                statement.setInt(1, id);
+                statement.execute();
+
+                return statement.getUpdateCount();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }
