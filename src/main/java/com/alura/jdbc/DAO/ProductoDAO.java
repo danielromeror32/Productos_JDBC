@@ -83,6 +83,24 @@ public class ProductoDAO {
             throw new RuntimeException(e);
         }
     }
+    public int modificar(String nombre, String descripcion, Integer cantidad, Integer id){
 
+        int updateCount;
+        String sql = "UPDATE producto SET nombre=?, descripcion=?, cantidad=? WHERE id=?";
+        try{
+            final PreparedStatement preparedStatement = con.prepareStatement(sql);
+            try (preparedStatement) {
+                preparedStatement.setString(1, nombre);
+                preparedStatement.setString(2, descripcion);
+                preparedStatement.setInt(3, cantidad);
+                preparedStatement.setInt(4, id);
+
+                updateCount = preparedStatement.executeUpdate();
+            }
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return updateCount;
+    }
 
 }
