@@ -168,7 +168,7 @@ public class ControlDeStockFrame extends JFrame {
         });
     }
 
-    private void abrirReporte() {
+    private void    abrirReporte() {
         new ReporteFrame(this);
     }
 
@@ -243,8 +243,8 @@ public class ControlDeStockFrame extends JFrame {
         // TODO
         var producto =  new Producto(textoNombre.getText(),textoDescripcion.getText(), cantidadInt);
 
-        var categoria = comboCategoria.getSelectedItem();
-        this.productoController.guardar(producto);
+        var categoria = (Categoria) comboCategoria.getSelectedItem();
+        this.productoController.guardar(producto, categoria.getId());
 
         JOptionPane.showMessageDialog(this, "Registrado con éxito!");
 

@@ -20,9 +20,9 @@ public class CategoriaController {
 		return categoriaDAO.listar();
 	}
 
-    public List<?> cargaReporte() {
+    public List<Categoria> cargaReporte() {
         // TODO
-        return new ArrayList<>();
+        return this.categoriaDAO.listarConProductos();
     }
 
 }

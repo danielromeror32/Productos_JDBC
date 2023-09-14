@@ -21,12 +21,13 @@ public class ProductoDAO {
             PreparedStatement statement;
             statement = con.prepareStatement(
                     "INSERT INTO PRODUCTO "
-                            + "(nombre, descripcion, cantidad)"
-                            + " VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                            + "(nombre, descripcion, cantidad, categoria_id)"
+                            + " VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             try (statement) {
                 statement.setString(1, producto.getNombre());
                 statement.setString(2, producto.getDescripcion());
                 statement.setInt(3, producto.getCantidad());
+                statement.setInt(4, producto.getIdCategoria());
 
                 statement.execute();
 
@@ -103,4 +104,26 @@ public class ProductoDAO {
         return updateCount;
     }
 
+    public List<Producto> listar(Integer categoriaId) {
+        List<Producto> resultado = new ArrayList<>();
+        var selectQuery = "SELECT id, nombre, descripcion, cantidad FROM producto WHERE categoria_id = ?";
+        System.out.println(selectQuery);
+        try  {
+            PreparedStatement statement = con.prepareStatement(selectQuery);
+            statement.setInt(1,categoriaId);
+            statement.execute();
+            final ResultSet resultSet = statement.getResultSet();
+            try(resultSet){
+                while (resultSet.next()) {
+                    Producto fila = new Producto(resultSet.getInt("id"),
+                            resultSet.getString("nombre"), resultSet.getString("descripcion"),
+                            resultSet.getInt("cantidad"));
+                    resultado.add(fila);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return resultado;
+    }
 }
